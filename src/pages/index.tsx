@@ -2,10 +2,8 @@ import { type NextPage } from "next";
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
-// import { Metronome } from "../components/Metronome";
-import { ReactMic } from "react-mic";
+// import Metronome from "../components/Metronome";
 import dynamic from "next/dynamic";
-import { Navbar } from "../components/Navbar";
 
 const Home: NextPage = () => {
   const Metronome = dynamic(() => import("../components/Metronome"), {

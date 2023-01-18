@@ -9,16 +9,15 @@
     "start": "next start"
   },
   "dependencies": {
-    "@cleandersonlobo/react-mic": "^1.2.0",
     "@fortawesome/fontawesome-svg-core": "^6.2.1",
     "@fortawesome/free-brands-svg-icons": "^6.2.1",
     "@fortawesome/free-regular-svg-icons": "^6.2.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@types/react-mic": "^12.4.3",
+    "@types/wavesurfer.js": "^6.0.3",
     "next": "13.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-mic": "^12.4.6",
+    "wavesurfer.js": "^6.4.0",
     "zod": "^3.20.2"
   },
   "devDependencies": {
