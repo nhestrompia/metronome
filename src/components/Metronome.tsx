@@ -2,11 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 // import WaveSurfer from "wavesurfer.js/src/wavesurfer";
 import WaveSurfer from "wavesurfer.js";
 // @ts-ignore
-import MicrophonePlugin from "wavesurfer.js/dist/plugin/wavesurfer.microphone.min.js";
+// import MicrophonePlugin from "wavesurfer.js/dist/plugin/wavesurfer.microphone.min.js";
+import MicrophonePlugin from "wavesurfer.js/src/plugin/microphone";
 
 const Metronome: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [bpm, setBpm] = useState(90);
+  const [bpm, setBpm] = useState<number>(90);
   const [isShow, setIsShow] = useState(false);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | undefined>(
     undefined
@@ -31,9 +32,12 @@ const Metronome: React.FC = () => {
         barWidth: 3,
         barRadius: 3,
         cursorWidth: 1,
+        interact: false,
         height: 200,
         barGap: 3,
-        // plugins: [MicrophonePlugin.create()],
+        backend: "MediaElement",
+        // backend: "MediaElementWebAudio",
+        plugins: [MicrophonePlugin.create({ wavesurfer: wavesurfer })],
       });
 
       // Load audio from a remote url.
@@ -48,29 +52,33 @@ const Metronome: React.FC = () => {
   		3. Load the audio using wavesurfer's loadBlob API
    */
     }
+
+    return () => wavesurfer.current?.destroy();
   }, []);
 
   console.log("mic", wavesurfer.current?.microphone);
 
   const startRecording = () => {
     // setIsShow(true);
-    clearInterval(intervalId);
-    if (mediaRecorder) {
+    if (bpm !== 0) {
+      clearInterval(intervalId);
+      // if (mediaRecorder) {
+      //   setIsRecording(true);
+      //   mediaRecorder.start();
+      //   mediaRecorder.addEventListener("dataavailable", handleDataAvailable);
+      // }
       setIsRecording(true);
-      mediaRecorder.start();
-      mediaRecorder.addEventListener("dataavailable", handleDataAvailable);
+      wavesurfer.current?.microphone.start();
     }
-    setIsRecording(true);
-    // wavesurfer.current?.microphone.start();
   };
 
   const stopRecording = () => {
-    if (mediaRecorder) {
-      setIsRecording(false);
-      mediaRecorder.stop();
-      mediaRecorder.removeEventListener("dataavailable", handleDataAvailable);
-    }
-    // wavesurfer.current?.microphone.stop();
+    // if (mediaRecorder) {
+    //   setIsRecording(false);
+    //   mediaRecorder.stop();
+    //   mediaRecorder.removeEventListener("dataavailable", handleDataAvailable);
+    // }
+    wavesurfer.current?.microphone.stop();
     setIsRecording(false);
   };
 
@@ -103,26 +111,29 @@ const Metronome: React.FC = () => {
   };
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-      setMediaRecorder(new MediaRecorder(stream));
-    });
-    // wavesurfer.current!.microphone.on("deviceReady", function (stream) {
+    // navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
     //   setMediaRecorder(new MediaRecorder(stream));
     // });
+    wavesurfer.current!.microphone.on("deviceReady", function (stream) {
+      setMediaRecorder(new MediaRecorder(stream));
+      console.log("stream", stream);
+    });
   }, []);
 
-  console.log("wawve", wavesurfer);
+  // console.log("wawve", wavesurfer);
 
   useEffect(() => {
-    if (isRecording) {
-      setIntervalId(
-        setInterval(() => {
-          const src = "/click.wav";
-          new Audio(src).play();
-        }, (60 / bpm) * 1000)
-      );
-    } else {
-      clearInterval(intervalId);
+    if (bpm !== 0) {
+      if (isRecording) {
+        setIntervalId(
+          setInterval(() => {
+            const src = "/click.wav";
+            new Audio(src).play();
+          }, (60 / bpm) * 1000)
+        );
+      } else {
+        clearInterval(intervalId);
+      }
     }
 
     return () => clearInterval(intervalId);
@@ -143,7 +154,7 @@ const Metronome: React.FC = () => {
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     clearInterval(intervalId);
 
-    setBpm(parseInt(event.target.value));
+    setBpm(parseInt(event.target.value) || 0);
   };
 
   return (
@@ -160,7 +171,7 @@ const Metronome: React.FC = () => {
           onChange={onChange}
           required
           value={bpm}
-          className="w-16 bg-transparent font-montserrat text-4xl text-white focus:outline-none"
+          className="w-20 bg-transparent font-montserrat text-5xl text-white focus:outline-none"
         />
         <button
           onClick={increaseSpeed}
@@ -194,6 +205,12 @@ const Metronome: React.FC = () => {
             Start
           </button>
         )}
+        {/* <button
+          className="w-fit rounded-xl bg-[#1E293B] px-[22px] py-3 font-montserrat text-xl tracking-widest text-white hover:shadow-lg"
+          onClick={downloadRecording}
+        >
+          Download
+        </button> */}
       </div>
     </div>
   );
