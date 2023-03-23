@@ -1,14 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-// import WaveSurfer from "wavesurfer.js/src/wavesurfer";
-import WaveSurfer from "wavesurfer.js";
-// @ts-ignore
-// import MicrophonePlugin from "wavesurfer.js/dist/plugin/wavesurfer.microphone.min.js";
-import MicrophonePlugin from "wavesurfer.js/src/plugin/microphone";
 
 const Metronome: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [bpm, setBpm] = useState<number>(90);
-  const [isShow, setIsShow] = useState(false);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | undefined>(
     undefined
   );
@@ -16,47 +10,6 @@ const Metronome: React.FC = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
-
-  const wavesurfer = useRef<WaveSurfer | null>(null);
-
-  useEffect(() => {
-    // Check if wavesurfer object is already created.
-    if (!wavesurfer.current) {
-      // Create a wavesurfer object
-      // More info about options here https://wavesurfer-js.org/docs/options.html
-      wavesurfer.current = WaveSurfer.create({
-        container: "#waveform",
-        waveColor: "#D9DCFF",
-        progressColor: "#4353FF",
-        cursorColor: "#4353FF",
-        barWidth: 3,
-        barRadius: 3,
-        cursorWidth: 1,
-        interact: false,
-        height: 200,
-        barGap: 3,
-        backend: "MediaElement",
-        // backend: "MediaElementWebAudio",
-        plugins: [MicrophonePlugin.create({ wavesurfer: wavesurfer })],
-      });
-
-      // Load audio from a remote url.
-
-      // console.log("audo", audioChunks[0]!);
-      // wavesurfer.current.loadBlob(audioChunks[0]!);
-      // console.log("wave", wavesurfer);
-
-      /* To load a local audio file
-  	    1. Read the audio file as a array buffer.
-  		2. Create a blob from the array buffer
-  		3. Load the audio using wavesurfer's loadBlob API
-   */
-    }
-
-    return () => wavesurfer.current?.destroy();
-  }, []);
-
-  console.log("mic", wavesurfer.current?.microphone);
 
   const startRecording = () => {
     // setIsShow(true);
@@ -68,7 +21,6 @@ const Metronome: React.FC = () => {
       //   mediaRecorder.addEventListener("dataavailable", handleDataAvailable);
       // }
       setIsRecording(true);
-      wavesurfer.current?.microphone.start();
     }
   };
 
@@ -78,14 +30,13 @@ const Metronome: React.FC = () => {
     //   mediaRecorder.stop();
     //   mediaRecorder.removeEventListener("dataavailable", handleDataAvailable);
     // }
-    wavesurfer.current?.microphone.stop();
+
     setIsRecording(false);
   };
 
   const handleDataAvailable = (e: BlobEvent) => {
     setAudioChunks((prevAudioChunks) => [...prevAudioChunks, e.data]);
     console.log("data", e.data);
-    wavesurfer.current!.loadBlob(e.data);
   };
 
   console.log("audio", audioChunks);
@@ -109,16 +60,6 @@ const Metronome: React.FC = () => {
 
     console.log(numberOfClick);
   };
-
-  useEffect(() => {
-    // navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-    //   setMediaRecorder(new MediaRecorder(stream));
-    // });
-    wavesurfer.current!.microphone.on("deviceReady", function (stream) {
-      setMediaRecorder(new MediaRecorder(stream));
-      console.log("stream", stream);
-    });
-  }, []);
 
   // console.log("wawve", wavesurfer);
 
@@ -159,11 +100,6 @@ const Metronome: React.FC = () => {
 
   return (
     <div className="grid w-full grid-cols-2 grid-rows-2 items-center justify-center ">
-      <div
-        id="waveform"
-        className="relative left-80 col-start-1 row-start-1 flex items-center justify-center"
-      ></div>
-
       <div className="relative top-24 left-80 col-start-1 row-start-2 flex flex-row items-center justify-center   gap-4">
         <input
           type="text"

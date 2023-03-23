@@ -4,7 +4,9 @@ import {
   faApple,
   faGooglePlay,
   faGithub,
+  faAppStore,
 } from "@fortawesome/free-brands-svg-icons";
+// @ts-ignore
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const Navbar: React.FC = () => {
