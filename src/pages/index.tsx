@@ -1,10 +1,8 @@
 import { type NextPage } from "next";
-import { useState, useEffect } from "react";
 import Head from "next/head";
-import Link from "next/link";
 // import Metronome from "../components/Metronome";
 import dynamic from "next/dynamic";
-import Waveform from "../components/Waveform";
+// import Waveform from "../components/Waveform";
 
 const Home: NextPage = () => {
   // const Metronome = dynamic(() => import("../components/Metronome"), {
